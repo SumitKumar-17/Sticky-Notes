@@ -1,18 +1,18 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "sticky-notes",
+  "productName": "Sticky Checklist Notes",
   "version": "0.1.0",
   "identifier": "com.sumitk.sticky-notes",
   "build": {
-    "beforeDevCommand": "pnpm dev",
+    "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm build",
+    "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
   "app": {
     "windows": [
       {
-        "title": "sticky-notes",
+        "title": "Sticky Checklist Notes",
         "width": 800,
         "height": 600
       }
