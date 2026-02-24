@@ -1,7 +1,14 @@
 :root {
+  --bg: #eef4f0;
+  --panel: rgba(255, 255, 255, 0.84);
+  --line: #bfd0c4;
+  --text: #18231d;
+  --subtle: #5d7364;
+  --accent: #2f7f58;
+  --accent-soft: #e8f6ed;
+  --danger: #9f3434;
   font-family: "Noto Sans", "Liberation Sans", sans-serif;
-  color: #1b1f1e;
-  background: linear-gradient(140deg, #f4f8f2, #e8f0ea);
+  color: var(--text);
 }
 
 * {
@@ -11,6 +18,10 @@
 body {
   margin: 0;
   min-height: 100vh;
+  background:
+    radial-gradient(circle at 10% 10%, #dcebd9 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, #d2e4df 0%, transparent 35%),
+    var(--bg);
 }
 
 #root {
@@ -19,23 +30,23 @@ body {
 
 .app-shell {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 340px 1fr;
   min-height: 100vh;
 }
 
 .notes-pane {
   padding: 1rem;
-  border-right: 1px solid #c7d6cc;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(4px);
+  border-right: 1px solid var(--line);
+  background: var(--panel);
+  backdrop-filter: blur(6px);
 }
 
 .notes-pane-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 0.7rem;
+  margin-bottom: 0.8rem;
 }
 
 .notes-pane-header h1 {
@@ -43,33 +54,40 @@ body {
   font-size: 1.15rem;
 }
 
-.search-input {
+.sidebar-actions {
+  display: flex;
+  gap: 0.55rem;
+  margin-bottom: 0.7rem;
+}
+
+.search-input,
+.sort-select {
   width: 100%;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.65rem;
 }
 
 .note-list {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.55rem;
 }
 
 .note-card {
   width: 100%;
   text-align: left;
-  border: 1px solid #b7ccc0;
-  border-radius: 10px;
-  background: #ffffff;
-  padding: 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.72rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.2rem;
   cursor: pointer;
 }
 
 .note-card.active {
-  border-color: #3e8b64;
-  background: #eef9f1;
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .note-title {
@@ -77,35 +95,32 @@ body {
 }
 
 .note-meta {
-  font-size: 0.85rem;
-  color: #50715d;
+  font-size: 0.84rem;
+  color: var(--subtle);
+}
+
+.editor-with-status {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .editor-pane {
   padding: 1.2rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.9rem;
 }
 
 .editor-header {
   display: flex;
-  gap: 0.8rem;
+  gap: 0.7rem;
 }
 
 .title-input {
   flex: 1;
-  font-size: 1.1rem;
+  font-size: 1.08rem;
   font-weight: 700;
-}
-
-.add-item-row {
-  display: flex;
-  gap: 0.6rem;
-}
-
-.add-item-row input {
-  flex: 1;
 }
 
 .progress-row {
@@ -118,37 +133,47 @@ body {
   flex: 1;
   height: 10px;
   border-radius: 999px;
-  background: #d7e8dd;
+  background: #d3e6da;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: #3e8b64;
+  background: var(--accent);
   transition: width 0.2s ease;
+}
+
+.add-item-row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.add-item-row input {
+  flex: 1;
 }
 
 .item-controls {
   display: flex;
   justify-content: space-between;
-  gap: 0.7rem;
   align-items: center;
+  gap: 0.7rem;
 }
 
 .filter-row {
   display: flex;
   gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
 .active-filter {
-  border-color: #3e8b64;
-  background: #eef9f1;
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .checklist {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.55rem;
 }
 
 .checklist-item {
@@ -156,24 +181,26 @@ body {
   grid-template-columns: auto 1fr auto;
   gap: 0.6rem;
   align-items: center;
-  border: 1px solid #d3ddd6;
-  background: rgba(255, 255, 255, 0.88);
-  border-radius: 10px;
+  border: 1px solid #cddcd2;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 11px;
   padding: 0.55rem;
 }
 
 .item-text.done {
   text-decoration: line-through;
-  color: #6b7e72;
+  color: #738578;
 }
 
 button,
-input {
-  border: 1px solid #b6c8bd;
+input,
+select {
+  border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 0.55rem 0.7rem;
+  padding: 0.54rem 0.68rem;
   font: inherit;
   background: #fff;
+  color: var(--text);
 }
 
 button {
@@ -181,52 +208,60 @@ button {
 }
 
 button:hover {
-  border-color: #5b9f78;
+  border-color: var(--accent);
 }
 
 button:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 button.danger {
-  border-color: #bc6d6d;
-  color: #8a2e2e;
+  border-color: #cfaaaa;
+  color: var(--danger);
 }
 
 button.ghost {
-  border-color: #d4dada;
-  color: #6a7171;
-}
-
-.muted {
-  color: #667f70;
-  font-size: 0.92rem;
+  border-color: #d2ded7;
+  color: #5f6f66;
 }
 
 .status-row {
   margin-top: auto;
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  padding: 0.8rem 1.2rem 1.1rem;
+  border-top: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.68);
+  color: #55675d;
   font-size: 0.9rem;
-  color: #56675d;
 }
 
 .error {
   color: #9d2e2e;
 }
 
-.empty-state {
-  color: #657a6f;
+.muted {
+  color: var(--subtle);
+  font-size: 0.92rem;
 }
 
-@media (max-width: 900px) {
+.empty-state {
+  color: var(--subtle);
+}
+
+.hidden-input {
+  display: none;
+}
+
+@media (max-width: 980px) {
   .app-shell {
     grid-template-columns: 1fr;
   }
 
   .notes-pane {
     border-right: 0;
-    border-bottom: 1px solid #c7d6cc;
+    border-bottom: 1px solid var(--line);
   }
 }
