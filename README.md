@@ -2,8 +2,13 @@
 
 Desktop checklist-notes app for Linux. You can:
 - Create notes
+- Search notes by title or checklist text
+- Duplicate notes
 - Edit note titles
 - Add/edit/toggle/delete checklist items
+- Filter checklist items (all/open/done)
+- Clear completed checklist items
+- Track completion progress
 - Delete notes
 - Keep notes persisted locally in app data
 
