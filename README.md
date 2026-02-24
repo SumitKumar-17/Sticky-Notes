@@ -1,5 +1,7 @@
 # Sticky Checklist Notes (Tauri + React)
 
+![Sticky Checklist Notes Demo](./demo.png)
+
 Desktop checklist-notes app for Linux. You can:
 - Create notes
 - Search notes by title or checklist text
