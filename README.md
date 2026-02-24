@@ -1,7 +1,40 @@
-# Tauri + React + Typescript
+# Sticky Checklist Notes (Tauri + React)
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+Desktop checklist-notes app for Linux. You can:
+- Create notes
+- Edit note titles
+- Add/edit/toggle/delete checklist items
+- Delete notes
+- Keep notes persisted locally in app data
 
-## Recommended IDE Setup
+## Arch Linux prerequisites
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+```bash
+sudo pacman -S --needed \
+  base-devel curl wget file openssl appmenu-gtk-module gtk3 \
+  libappindicator-gtk3 librsvg xdg-utils webkit2gtk-4.1 \
+  llvm clang lld
+```
+
+Install Node.js (LTS), npm, and Rust:
+
+```bash
+sudo pacman -S --needed nodejs npm rustup
+rustup default stable
+```
+
+## Run in development
+
+```bash
+npm install
+npm run tauri dev
+```
+
+## Build installable app/package
+
+```bash
+npm run tauri build
+```
+
+Build output will be generated under:
+- `src-tauri/target/release/bundle/`
