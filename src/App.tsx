@@ -4,7 +4,7 @@ import { NotesSidebar } from "./components/NotesSidebar";
 import { useNotes } from "./hooks/useNotes";
 import { ItemFilter, NoteSort } from "./types/note";
 import { exportNotesAsJson, readJsonFile } from "./utils/fileTransfer";
-import { sortNotes } from "./utils/noteHelpers";
+import { moveInArray, sortNotes } from "./utils/noteHelpers";
 import "./App.css";
 
 function App() {
@@ -20,6 +20,7 @@ function App() {
     duplicateActiveNote,
     updateActiveNote,
     removeActiveNote,
+    reorderNotes,
     importNotes,
     clearError,
   } = useNotes();
@@ -27,7 +28,7 @@ function App() {
   const [newItemText, setNewItemText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [itemFilter, setItemFilter] = useState<ItemFilter>("all");
-  const [sortBy, setSortBy] = useState<NoteSort>("recent");
+  const [sortBy, setSortBy] = useState<NoteSort>("manual");
   const [importMessage, setImportMessage] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -43,6 +44,7 @@ function App() {
     });
     return sortNotes(filtered, sortBy);
   }, [notes, searchQuery, sortBy]);
+  const canDragReorderNotes = sortBy === "manual" && searchQuery.trim().length === 0;
 
   async function handleImport(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
@@ -67,6 +69,18 @@ function App() {
     setImportMessage("Exported notes JSON.");
   }
 
+  function reorderChecklistItems(sourceId: string, targetId: string) {
+    if (!activeNote || sourceId === targetId) return;
+    const sourceIndex = activeNote.items.findIndex((item) => item.id === sourceId);
+    const targetIndex = activeNote.items.findIndex((item) => item.id === targetId);
+    if (sourceIndex === -1 || targetIndex === -1) return;
+
+    updateActiveNote((note) => ({
+      ...note,
+      items: moveInArray(note.items, sourceIndex, targetIndex),
+    }));
+  }
+
   return (
     <main className="app-shell">
       <input
@@ -86,9 +100,11 @@ function App() {
         onImportClick={() => fileInputRef.current?.click()}
         onSearchChange={setSearchQuery}
         onSelect={setActiveNoteId}
+        onReorder={reorderNotes}
         onSortChange={setSortBy}
         searchQuery={searchQuery}
         sortBy={sortBy}
+        canDragReorder={canDragReorderNotes}
       />
 
       <section className="editor-with-status">
@@ -100,6 +116,7 @@ function App() {
           onDuplicate={duplicateActiveNote}
           onFilterChange={setItemFilter}
           onNewItemTextChange={setNewItemText}
+          onReorderItems={reorderChecklistItems}
           onUpdate={updateActiveNote}
         />
 

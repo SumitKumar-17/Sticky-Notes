@@ -90,6 +90,10 @@ body {
   background: var(--accent-soft);
 }
 
+.note-card[draggable="true"] {
+  cursor: grab;
+}
+
 .note-title {
   font-weight: 700;
 }
@@ -185,6 +189,10 @@ body {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 11px;
   padding: 0.55rem;
+}
+
+.checklist-item[draggable="true"] {
+  cursor: grab;
 }
 
 .item-text.done {

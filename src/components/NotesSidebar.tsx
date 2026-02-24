@@ -12,6 +12,8 @@ type Props = {
   onCreate: () => void;
   onExport: () => void;
   onImportClick: () => void;
+  canDragReorder: boolean;
+  onReorder: (sourceId: string, targetId: string) => void;
 };
 
 export function NotesSidebar(props: Props) {
@@ -45,10 +47,14 @@ export function NotesSidebar(props: Props) {
         onChange={(event) => props.onSortChange(event.currentTarget.value as NoteSort)}
         value={props.sortBy}
       >
+        <option value="manual">Sort: Manual drag order</option>
         <option value="recent">Sort: Recently updated</option>
         <option value="title">Sort: Title A-Z</option>
         <option value="completion">Sort: Completion</option>
       </select>
+      {props.canDragReorder && (
+        <p className="muted">Drag a note card and drop it on another note to reorder.</p>
+      )}
 
       {props.isLoading && <p className="muted">Loading notes...</p>}
       {!props.isLoading && props.notes.length === 0 && (
@@ -61,6 +67,23 @@ export function NotesSidebar(props: Props) {
           return (
             <button
               className={`note-card ${note.id === props.activeNoteId ? "active" : ""}`}
+              draggable={props.canDragReorder}
+              onDragOver={(event) => {
+                if (!props.canDragReorder) return;
+                event.preventDefault();
+              }}
+              onDrop={(event) => {
+                if (!props.canDragReorder) return;
+                event.preventDefault();
+                const sourceId = event.dataTransfer.getData("text/note-id");
+                if (!sourceId) return;
+                props.onReorder(sourceId, note.id);
+              }}
+              onDragStart={(event) => {
+                if (!props.canDragReorder) return;
+                event.dataTransfer.setData("text/note-id", note.id);
+                event.dataTransfer.effectAllowed = "move";
+              }}
               key={note.id}
               onClick={() => props.onSelect(note.id)}
               type="button"

@@ -6,6 +6,9 @@ export function createLocalId(prefix: string) {
 
 export function sortNotes(notes: Note[], sort: NoteSort) {
   const copy = [...notes];
+  if (sort === "manual") {
+    return copy.sort((a, b) => a.order - b.order);
+  }
   if (sort === "title") {
     return copy.sort((a, b) => a.title.localeCompare(b.title));
   }
@@ -13,6 +16,14 @@ export function sortNotes(notes: Note[], sort: NoteSort) {
     return copy.sort((a, b) => completionRatio(b) - completionRatio(a));
   }
   return copy.sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+export function moveInArray<T>(items: T[], from: number, to: number) {
+  if (from === to) return [...items];
+  const copy = [...items];
+  const [item] = copy.splice(from, 1);
+  copy.splice(to, 0, item);
+  return copy;
 }
 
 function completionRatio(note: Note) {
@@ -41,6 +52,7 @@ function normalizeSingleNote(raw: unknown, index: number): Note {
     id: createLocalId("note"),
     title: typeof partial.title === "string" ? partial.title : `Imported note ${index + 1}`,
     items: normalizeItems(partial.items),
+    order: typeof partial.order === "number" ? partial.order : index + 1,
     createdAt: typeof partial.createdAt === "number" ? partial.createdAt : now,
     updatedAt: now,
   };

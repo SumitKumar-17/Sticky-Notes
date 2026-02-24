@@ -20,6 +20,8 @@ struct Note {
     id: String,
     title: String,
     items: Vec<ChecklistItem>,
+    #[serde(default)]
+    order: u64,
     created_at: u128,
     updated_at: u128,
 }
@@ -72,7 +74,15 @@ fn save_notes_internal(app: &tauri::AppHandle, notes: &[Note]) -> Result<(), Str
 #[tauri::command]
 fn list_notes(app: tauri::AppHandle) -> Result<Vec<Note>, String> {
     let mut notes = load_notes_internal(&app)?;
-    notes.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
+    let needs_order_migration = notes.iter().any(|note| note.order == 0);
+    if needs_order_migration {
+        notes.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
+        for (index, note) in notes.iter_mut().enumerate() {
+            note.order = index as u64 + 1;
+        }
+        save_notes_internal(&app, &notes)?;
+    }
+    notes.sort_by(|a, b| a.order.cmp(&b.order).then_with(|| b.updated_at.cmp(&a.updated_at)));
     Ok(notes)
 }
 
@@ -80,10 +90,12 @@ fn list_notes(app: tauri::AppHandle) -> Result<Vec<Note>, String> {
 fn create_note(app: tauri::AppHandle, title: Option<String>) -> Result<Note, String> {
     let mut notes = load_notes_internal(&app)?;
     let now = now_millis();
+    let next_order = notes.iter().map(|note| note.order).max().unwrap_or(0) + 1;
     let note = Note {
         id: generate_id("note"),
         title: title.unwrap_or_else(|| "Untitled note".to_string()),
         items: Vec::new(),
+        order: next_order,
         created_at: now,
         updated_at: now,
     };
@@ -100,10 +112,14 @@ fn save_note(app: tauri::AppHandle, mut note: Note) -> Result<Note, String> {
 
     if let Some(existing) = notes.iter_mut().find(|n| n.id == note.id) {
         note.created_at = existing.created_at;
+        note.order = existing.order;
         *existing = note.clone();
     } else {
         if note.created_at == 0 {
             note.created_at = note.updated_at;
+        }
+        if note.order == 0 {
+            note.order = notes.iter().map(|n| n.order).max().unwrap_or(0) + 1;
         }
         notes.push(note.clone());
     }
@@ -119,6 +135,17 @@ fn delete_note(app: tauri::AppHandle, id: String) -> Result<(), String> {
     save_notes_internal(&app, &notes)
 }
 
+#[tauri::command]
+fn reorder_notes(app: tauri::AppHandle, ids: Vec<String>) -> Result<(), String> {
+    let mut notes = load_notes_internal(&app)?;
+    for (index, id) in ids.iter().enumerate() {
+        if let Some(note) = notes.iter_mut().find(|note| note.id == *id) {
+            note.order = index as u64 + 1;
+        }
+    }
+    save_notes_internal(&app, &notes)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -127,7 +154,8 @@ pub fn run() {
             list_notes,
             create_note,
             save_note,
-            delete_note
+            delete_note,
+            reorder_notes
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

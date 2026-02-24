@@ -11,6 +11,7 @@ type Props = {
   onUpdate: (updater: (note: Note) => Note) => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  onReorderItems: (sourceId: string, targetId: string) => void;
 };
 
 export function NoteEditor(props: Props) {
@@ -30,6 +31,7 @@ export function NoteEditor(props: Props) {
     if (props.itemFilter === "done") return item.done;
     return true;
   });
+  const canDragItems = props.itemFilter === "all";
 
   function addChecklistItem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -157,8 +159,34 @@ export function NoteEditor(props: Props) {
         {props.note.items.length > 0 && visibleItems.length === 0 && (
           <p className="muted">No items in this filter.</p>
         )}
+        {!canDragItems && props.note.items.length > 1 && (
+          <p className="muted">Switch filter to "All" to drag and reorder items.</p>
+        )}
+        {canDragItems && props.note.items.length > 1 && (
+          <p className="muted">Drag checklist rows to reorder.</p>
+        )}
         {visibleItems.map((item) => (
-          <div className="checklist-item" key={item.id}>
+          <div
+            className="checklist-item"
+            draggable={canDragItems}
+            key={item.id}
+            onDragOver={(event) => {
+              if (!canDragItems) return;
+              event.preventDefault();
+            }}
+            onDrop={(event) => {
+              if (!canDragItems) return;
+              event.preventDefault();
+              const sourceId = event.dataTransfer.getData("text/item-id");
+              if (!sourceId) return;
+              props.onReorderItems(sourceId, item.id);
+            }}
+            onDragStart={(event) => {
+              if (!canDragItems) return;
+              event.dataTransfer.setData("text/item-id", item.id);
+              event.dataTransfer.effectAllowed = "move";
+            }}
+          >
             <input
               checked={item.done}
               onChange={() =>

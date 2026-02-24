@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { Note, SaveState } from "../types/note";
-import { createLocalId, normalizeImportedNotes, sortNotes } from "../utils/noteHelpers";
+import {
+  createLocalId,
+  moveInArray,
+  normalizeImportedNotes,
+  sortNotes,
+} from "../utils/noteHelpers";
 
 export function useNotes() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -51,7 +56,7 @@ export function useNotes() {
       const note = await invoke<Note>("create_note", {
         title: `New note ${notes.length + 1}`,
       });
-      setNotes((prev) => sortNotes([note, ...prev], "recent"));
+      setNotes((prev) => sortNotes([note, ...prev], "manual"));
       setActiveNoteId(note.id);
       setSaveState("saved");
     } catch (createError) {
@@ -75,7 +80,7 @@ export function useNotes() {
         })),
       };
       const saved = await invoke<Note>("save_note", { note: duplicated });
-      setNotes((prev) => sortNotes([saved, ...prev], "recent"));
+      setNotes((prev) => sortNotes([saved, ...prev], "manual"));
       setActiveNoteId(saved.id);
       setSaveState("saved");
     } catch (duplicateError) {
@@ -95,12 +100,7 @@ export function useNotes() {
       setError("");
       try {
         const saved = await invoke<Note>("save_note", { note: updatedNote });
-        setNotes((prev) =>
-          sortNotes(
-            prev.map((note) => (note.id === saved.id ? saved : note)),
-            "recent",
-          ),
-        );
+        setNotes((prev) => prev.map((note) => (note.id === saved.id ? saved : note)));
         setSaveState("saved");
       } catch (saveError) {
         setError(String(saveError));
@@ -116,10 +116,7 @@ export function useNotes() {
       updatedAt: Date.now(),
     };
     setNotes((prev) =>
-      sortNotes(
-        prev.map((note) => (note.id === updated.id ? updated : note)),
-        "recent",
-      ),
+      prev.map((note) => (note.id === updated.id ? updated : note)),
     );
     schedulePersist(updated);
   }
@@ -171,6 +168,30 @@ export function useNotes() {
     setError("");
   }
 
+  async function reorderNotes(sourceId: string, targetId: string) {
+    if (sourceId === targetId) return;
+
+    const sourceIndex = notes.findIndex((note) => note.id === sourceId);
+    const targetIndex = notes.findIndex((note) => note.id === targetId);
+    if (sourceIndex === -1 || targetIndex === -1) return;
+
+    const moved = moveInArray(notes, sourceIndex, targetIndex).map((note, index) => ({
+      ...note,
+      order: index + 1,
+    }));
+    setNotes(moved);
+    setSaveState("saving");
+    setError("");
+
+    try {
+      await invoke("reorder_notes", { ids: moved.map((note) => note.id) });
+      setSaveState("saved");
+    } catch (reorderError) {
+      setError(String(reorderError));
+      setSaveState("error");
+    }
+  }
+
   return {
     notes,
     setNotes,
@@ -184,6 +205,7 @@ export function useNotes() {
     duplicateActiveNote,
     updateActiveNote,
     removeActiveNote,
+    reorderNotes,
     importNotes,
     clearError,
   };
