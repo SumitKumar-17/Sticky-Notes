@@ -1,6 +1,16 @@
 import { FormEvent } from "react";
-import { ItemFilter, Note } from "../types/note";
+import { ItemFilter, Note, NoteColor, NOTE_COLORS } from "../types/note";
 import { createLocalId } from "../utils/noteHelpers";
+
+const COLOR_LABELS: Record<NoteColor, string> = {
+  none: "No color",
+  yellow: "Yellow",
+  green: "Green",
+  blue: "Blue",
+  pink: "Pink",
+  purple: "Purple",
+  orange: "Orange",
+};
 
 type Props = {
   note: Note | null;
@@ -65,6 +75,19 @@ export function NoteEditor(props: Props) {
         <button className="danger" onClick={props.onDelete} type="button">
           Delete
         </button>
+      </div>
+
+      <div className="color-picker">
+        {NOTE_COLORS.map((c) => (
+          <button
+            aria-label={COLOR_LABELS[c]}
+            className={`color-swatch color-swatch-${c}${props.note.color === c ? " selected" : ""}`}
+            key={c}
+            onClick={() => props.onUpdate((note) => ({ ...note, color: c }))}
+            title={COLOR_LABELS[c]}
+            type="button"
+          />
+        ))}
       </div>
 
       <div className="progress-row">

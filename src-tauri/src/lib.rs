@@ -14,12 +14,18 @@ struct ChecklistItem {
     done: bool,
 }
 
+fn default_note_color() -> String {
+    "none".to_string()
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct Note {
     id: String,
     title: String,
     items: Vec<ChecklistItem>,
+    #[serde(default = "default_note_color")]
+    color: String,
     #[serde(default)]
     order: u64,
     created_at: u128,
@@ -95,6 +101,7 @@ fn create_note(app: tauri::AppHandle, title: Option<String>) -> Result<Note, Str
         id: generate_id("note"),
         title: title.unwrap_or_else(|| "Untitled note".to_string()),
         items: Vec::new(),
+        color: default_note_color(),
         order: next_order,
         created_at: now,
         updated_at: now,

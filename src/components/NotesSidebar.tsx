@@ -66,7 +66,7 @@ export function NotesSidebar(props: Props) {
           const doneCount = note.items.filter((item) => item.done).length;
           return (
             <button
-              className={`note-card ${note.id === props.activeNoteId ? "active" : ""}`}
+              className={`note-card color-card-${note.color ?? "none"} ${note.id === props.activeNoteId ? "active" : ""}`}
               draggable={props.canDragReorder}
               onDragOver={(event) => {
                 if (!props.canDragReorder) return;

@@ -1,4 +1,6 @@
-import { Note, NoteSort } from "../types/note";
+import { Note, NoteColor, NoteSort } from "../types/note";
+
+const VALID_COLORS: NoteColor[] = ["none", "yellow", "green", "blue", "pink", "purple", "orange"];
 
 export function createLocalId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -48,10 +50,12 @@ function normalizeSingleNote(raw: unknown, index: number): Note {
   const partial = raw as Partial<Note>;
   const now = Date.now();
 
+  const color = VALID_COLORS.includes(partial.color as NoteColor) ? (partial.color as NoteColor) : "none";
   return {
     id: createLocalId("note"),
     title: typeof partial.title === "string" ? partial.title : `Imported note ${index + 1}`,
     items: normalizeItems(partial.items),
+    color,
     order: typeof partial.order === "number" ? partial.order : index + 1,
     createdAt: typeof partial.createdAt === "number" ? partial.createdAt : now,
     updatedAt: now,

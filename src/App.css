@@ -263,6 +263,60 @@ button.ghost {
   display: none;
 }
 
+/* ── Color picker ── */
+.color-picker {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.color-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  flex-shrink: 0;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+}
+
+.color-swatch:hover {
+  transform: scale(1.2);
+  border-color: var(--text) !important;
+}
+
+.color-swatch.selected {
+  border-color: var(--text) !important;
+  transform: scale(1.15);
+}
+
+.color-swatch-none   { background: #fff; border-color: var(--line); }
+.color-swatch-yellow { background: #fde68a; }
+.color-swatch-green  { background: #86efac; }
+.color-swatch-blue   { background: #93c5fd; }
+.color-swatch-pink   { background: #fca5a5; }
+.color-swatch-purple { background: #c4b5fd; }
+.color-swatch-orange { background: #fdba74; }
+
+/* ── Note card color variants ── */
+.note-card.color-card-yellow { background: #fefce8; border-color: #fde68a; }
+.note-card.color-card-yellow.active { background: #fef08a; border-color: #ca8a04; }
+
+.note-card.color-card-green { background: #f0fdf4; border-color: #86efac; }
+.note-card.color-card-green.active { background: #dcfce7; border-color: #16a34a; }
+
+.note-card.color-card-blue { background: #eff6ff; border-color: #93c5fd; }
+.note-card.color-card-blue.active { background: #dbeafe; border-color: #2563eb; }
+
+.note-card.color-card-pink { background: #fff1f2; border-color: #fca5a5; }
+.note-card.color-card-pink.active { background: #ffe4e6; border-color: #dc2626; }
+
+.note-card.color-card-purple { background: #faf5ff; border-color: #c4b5fd; }
+.note-card.color-card-purple.active { background: #ede9fe; border-color: #7c3aed; }
+
+.note-card.color-card-orange { background: #fff7ed; border-color: #fdba74; }
+.note-card.color-card-orange.active { background: #ffedd5; border-color: #ea580c; }
+
 @media (max-width: 980px) {
   .app-shell {
     grid-template-columns: 1fr;

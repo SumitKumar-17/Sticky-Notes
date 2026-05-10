@@ -4,10 +4,15 @@ export type ChecklistItem = {
   done: boolean;
 };
 
+export type NoteColor = "none" | "yellow" | "green" | "blue" | "pink" | "purple" | "orange";
+
+export const NOTE_COLORS: NoteColor[] = ["none", "yellow", "green", "blue", "pink", "purple", "orange"];
+
 export type Note = {
   id: string;
   title: string;
   items: ChecklistItem[];
+  color: NoteColor;
   order: number;
   createdAt: number;
   updatedAt: number;
